@@ -20757,53 +20757,130 @@ module.exports = require('./lib/React');
 
 },{"./lib/React":54}],172:[function(require,module,exports){
 var React = require('react');
-var ListItem = require('./ListItem.jsx');
+var AlbumItems = require('./AlbumItems.jsx');
 
-var ingredients = [{ "id": 1, "text": "ham" }, { "id": 2, "text": "cheese" }, { "id": 3, "text": "potatos" }];
-
-var List = React.createClass({
-  displayName: 'List',
+var Album = React.createClass({
+  displayName: 'Album',
 
   render: function () {
-    var listItems = ingredients.map(function (item) {
-      return React.createElement(ListItem, { key: item.id, ingredient: item.text });
-    });
+
+    var containerStyle = {
+      textAlign: "center"
+    };
+
+    var createItem = function (album, index) {
+      if (album.album_type === "album") {
+        return React.createElement(AlbumItems, { key: index + album, albumImage: album.images[1].url, albumTitle: album.name });
+      }
+    };
+
     return React.createElement(
-      'ul',
-      null,
-      listItems
+      'div',
+      { style: containerStyle },
+      React.createElement(
+        'ul',
+        null,
+        this.props.albums.map(createItem)
+      )
     );
   }
 });
 
-module.exports = List;
+module.exports = Album;
 
-},{"./ListItem.jsx":173,"react":171}],173:[function(require,module,exports){
+},{"./AlbumItems.jsx":173,"react":171}],173:[function(require,module,exports){
 var React = require('react');
 
-var ListItem = React.createClass({
-  displayName: 'ListItem',
+var AlbumItems = React.createClass({
+  displayName: 'AlbumItems',
 
   render: function () {
     return React.createElement(
       'li',
       null,
       React.createElement(
-        'h4',
+        'h1',
         null,
-        this.props.ingredient
+        this.props.albumTitle
+      ),
+      React.createElement('img', { src: this.props.albumImage })
+    );
+  }
+});
+
+module.exports = AlbumItems;
+
+},{"react":171}],174:[function(require,module,exports){
+var React = require('react');
+var Album = require('./Album.jsx');
+
+var AlbumSearch = React.createClass({
+  displayName: 'AlbumSearch',
+
+
+  render: function () {
+    return React.createElement(
+      'div',
+      null,
+      React.createElement(
+        'h1',
+        null,
+        'Search for Artist:'
+      ),
+      React.createElement('input', { onChange: this.props.updateInput, placeholder: 'Artist...' }),
+      React.createElement(
+        'button',
+        { onClick: this.props.handleSearch },
+        'Hit it!'
       )
     );
   }
 });
 
-module.exports = ListItem;
+module.exports = AlbumSearch;
 
-},{"react":171}],174:[function(require,module,exports){
+},{"./Album.jsx":172,"react":171}],175:[function(require,module,exports){
+var React = require('react');
+var AlbumSearch = require('./AlbumSearch.jsx');
+var Album = require('./Album.jsx');
+
+var AppManager = React.createClass({
+  displayName: 'AppManager',
+
+  getInitialState: function () {
+    return { albums: [], searchTerm: '' };
+  },
+
+  handleSearch: function () {
+    $.get("https://api.spotify.com/v1/search?query=" + this.state.searchTerm + "&offset=0&limit=20&type=album", data => {
+      let searchResults = data.albums.items;
+      this.setState({ albums: searchResults });
+    });
+  },
+
+  updateInput: function (e) {
+    var updatedSearchTerm = e.target.value;
+    this.setState({ searchTerm: updatedSearchTerm });
+  },
+
+  render: function () {
+    return React.createElement(
+      'div',
+      null,
+      React.createElement(AlbumSearch, { handleSearch: this.handleSearch, updateInput: this.updateInput }),
+      React.createElement(Album, { albums: this.state.albums })
+    );
+  }
+
+});
+
+module.exports = AppManager;
+
+},{"./Album.jsx":172,"./AlbumSearch.jsx":174,"react":171}],176:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
-var List = require('./components/List.jsx');
+var AppManager = require('./components/AppManager.jsx');
 
-ReactDOM.render(React.createElement(List, null), document.getElementById('ingredients'));
+ReactDOM.render(React.createElement(AppManager, null), document.getElementById('app'));
 
-},{"./components/List.jsx":172,"react":171,"react-dom":28}]},{},[174]);
+},{"./components/AppManager.jsx":175,"react":171,"react-dom":28}]},{},[176]);
