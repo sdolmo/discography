@@ -20764,19 +20764,19 @@ var Album = React.createClass({
 
   render: function () {
 
-    var containerStyle = {
-      textAlign: "center"
-    };
-
     var createItem = function (album, index) {
       if (album.album_type === "album") {
-        return React.createElement(AlbumItems, { key: index + album, albumImage: album.images[1].url, albumTitle: album.name });
+        return React.createElement(
+          'div',
+          { key: index + album, className: 'col-sm-4' },
+          React.createElement(AlbumItems, { albumImage: album.images[1].url, albumTitle: album.name })
+        );
       }
     };
 
     return React.createElement(
       'div',
-      { style: containerStyle },
+      null,
       React.createElement(
         'ul',
         null,
@@ -20795,11 +20795,12 @@ var AlbumItems = React.createClass({
   displayName: 'AlbumItems',
 
   render: function () {
+
     return React.createElement(
       'li',
       null,
       React.createElement(
-        'h1',
+        'h4',
         null,
         this.props.albumTitle
       ),
@@ -20823,11 +20824,11 @@ var AlbumSearch = React.createClass({
       'div',
       null,
       React.createElement(
-        'h1',
+        'h3',
         null,
         'Search for Artist:'
       ),
-      React.createElement('input', { onChange: this.props.updateInput, placeholder: 'Artist...' }),
+      React.createElement('input', { onChange: this.props.onChange, value: this.props.searchTerm, placeholder: 'Artist...' }),
       React.createElement(
         'button',
         { onClick: this.props.handleSearch },
@@ -20835,6 +20836,7 @@ var AlbumSearch = React.createClass({
       )
     );
   }
+
 });
 
 module.exports = AlbumSearch;
@@ -20851,24 +20853,89 @@ var AppManager = React.createClass({
     return { albums: [], searchTerm: '' };
   },
 
-  handleSearch: function () {
+  handleSearch: function (e) {
+    e.preventDefault();
+
     $.get("https://api.spotify.com/v1/search?query=" + this.state.searchTerm + "&offset=0&limit=20&type=album", data => {
       let searchResults = data.albums.items;
-      this.setState({ albums: searchResults });
+      this.setState({ albums: searchResults, searchTerm: '' });
     });
   },
 
-  updateInput: function (e) {
-    var updatedSearchTerm = e.target.value;
-    this.setState({ searchTerm: updatedSearchTerm });
+  onChange: function (e) {
+    this.setState({ searchTerm: e.target.value });
   },
 
   render: function () {
+
+    var styles = {
+      center: {
+        textAlign: "center",
+        position: "relative",
+        top: 100
+      },
+
+      left: {
+        marginLeft: 10
+      },
+
+      space: {
+        width: 200
+      },
+
+      height: {
+        height: 300
+      }
+    };
+
     return React.createElement(
       'div',
       null,
-      React.createElement(AlbumSearch, { handleSearch: this.handleSearch, updateInput: this.updateInput }),
-      React.createElement(Album, { albums: this.state.albums })
+      React.createElement(
+        'h1',
+        null,
+        'Discography'
+      ),
+      React.createElement(
+        'div',
+        { style: styles.height, className: 'row' },
+        React.createElement(
+          'div',
+          { className: 'col-sm-6 col-sm-offset-3' },
+          React.createElement(
+            'div',
+            { style: styles.center },
+            React.createElement(
+              'div',
+              null,
+              React.createElement(
+                'h3',
+                null,
+                'Search for Artist:'
+              )
+            ),
+            React.createElement(
+              'form',
+              { onSubmit: this.handleSearch, className: 'form-inline' },
+              React.createElement(
+                'div',
+                { className: 'row' },
+                React.createElement('input', { style: styles.space, onChange: this.onChange, value: this.state.searchTerm, className: 'form-control', placeholder: 'Artist Name...' }),
+                React.createElement(
+                  'button',
+                  { style: styles.left, className: 'btn btn-default' },
+                  'Hit it!'
+                )
+              )
+            )
+          )
+        )
+      ),
+      React.createElement(
+        'div',
+        { className: 'row' },
+        React.createElement(Album, { albums: this.state.albums })
+      )
     );
   }
 

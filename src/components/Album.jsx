@@ -4,18 +4,20 @@ var AlbumItems = require('./AlbumItems.jsx');
 var Album = React.createClass({
   render: function() {
 
-    var containerStyle = {
-      textAlign: "center"
-    }
+
 
     var createItem = function(album, index){
       if (album.album_type === "album") {
-        return <AlbumItems key={index + album} albumImage={album.images[1].url} albumTitle={album.name} />
+        return (
+          <div key={index + album} className="col-sm-4">
+            <AlbumItems albumImage={album.images[1].url} albumTitle={album.name} />
+          </div>
+        );
       }
     };
 
     return (
-      <div style={containerStyle}>
+      <div>
         <ul>{this.props.albums.map(createItem)}</ul>
       </div>
     );

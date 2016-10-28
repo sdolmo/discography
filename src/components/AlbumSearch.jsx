@@ -6,12 +6,13 @@ var AlbumSearch = React.createClass({
   render: function() {
     return (
       <div>
-        <h1>Search for Artist:</h1>
-        <input onChange={this.props.updateInput} placeholder="Artist..."/>
+        <h3>Search for Artist:</h3>
+        <input onChange={this.props.onChange} value={this.props.searchTerm} placeholder="Artist..."/>
         <button onClick={this.props.handleSearch}>Hit it!</button>
       </div>
     );
   }
+
 });
 
 module.exports = AlbumSearch;
