@@ -20768,7 +20768,7 @@ var Album = React.createClass({
       if (album.album_type === "album") {
         return React.createElement(
           'div',
-          { key: index + album, className: 'col-sm-4' },
+          { key: index + album, className: 'col-sm-4 albums' },
           React.createElement(AlbumItems, { albumImage: album.images[1].url, albumTitle: album.name })
         );
       }
